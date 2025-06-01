@@ -20,7 +20,7 @@ The application supports two user roles:
 ### Main Features
 | Home Screen | Map View | History |
 |-------------|----------|----------|
-| ![image](https://github.com/user-attachments/assets/eb4f4572-6f7b-4a16-8f0a-ed915b753a83) | ![image](https://github.com/user-attachments/assets/eea3327d-0a33-466b-824a-ae5ceddbce13) | ![image](https://github.com/user-attachments/assets/8ac4c831-b9fc-4744-a894-b228046207b4) |
+| ![image](https://github.com/user-attachments/assets/eb4f4572-6f7b-4a16-8f0a-ed915b753a83) | ![image](https://github.com/user-attachments/assets/875e7545-d203-4467-b71f-deb284517671) | ![image](https://github.com/user-attachments/assets/8ac4c831-b9fc-4744-a894-b228046207b4) |
 
 ### More Features
 | Add Auction Item | Bid Page |
