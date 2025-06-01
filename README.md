@@ -45,6 +45,11 @@ The application supports two user roles:
 - Bid management and oversight
 - User management system
 
+### New Features Added
+- Fetching real location data from external APIs such as Google Places API to display nearby places of worship.
+- Integration of Google Maps using the `google_maps_flutter` package to display dynamic location pins on the map.
+- Enhanced user experience with real-time location-based data visualization.
+
 ### General Features
 - Dual role system (Admin/Buyer)
 - Secure authentication with username/password
@@ -70,6 +75,8 @@ The application supports two user roles:
 - `permission_handler`: Device permission management
 - `google_fonts`: Custom typography
 - `url_launcher`: External link handling
+- `google_maps_flutter`: Google Maps integration for dynamic location pins
+- HTTP client packages for API data fetching
 
 ### Platform Support
 - Android ✅
@@ -127,6 +134,22 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is proprietary software. All rights reserved.
+
+## Technical Challenges and Solutions
+
+### Challenges
+- Integrating real-time location data from external APIs such as Google Places API.
+- Managing API authentication and handling network requests efficiently.
+- Displaying dynamic location pins on Google Maps within the Flutter application.
+- Handling user permissions for location access across multiple platforms.
+- Ensuring smooth performance and responsiveness with real-time data updates.
+
+### Solutions
+- Utilized the `google_maps_flutter` package for seamless Google Maps integration.
+- Implemented HTTP client packages to fetch and parse data from Google Places API.
+- Managed location permissions using the `permission_handler` package.
+- Optimized state management to update map pins dynamically without performance degradation.
+- Conducted thorough testing on multiple platforms to ensure consistent behavior.
 
 ## Contact
 
