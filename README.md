@@ -78,14 +78,6 @@ The application supports two user roles:
 - `google_maps_flutter`: Google Maps integration for dynamic location pins
 - HTTP client packages for API data fetching
 
-### Platform Support
-- Android ✅
-- iOS ✅
-- Web ✅
-- Windows ✅
-- macOS ✅
-- Linux ✅
-
 ## Getting Started
 
 ### Prerequisites
@@ -153,7 +145,7 @@ This project is proprietary software. All rights reserved.
 
 ## Contact
 
-For any inquiries about this project, please contact the development team.
+Instagram @Snnyrkh17_
 
 ---
 
