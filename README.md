@@ -11,7 +11,7 @@ E-Pelelangan is a comprehensive auction platform that connects buyers and admini
 ### User Authentication
 | Role Selection | Login Screen |
 |----------------|--------------|
-| <img src="screenshots/role_selection.png" width="300"> | <img src="screenshots/login.png" width="300"> |
+| ![image](https://github.com/user-attachments/assets/ee6fce23-e063-4a27-8da5-8c35d30506b1) | ![image](https://github.com/user-attachments/assets/0425d171-ad59-413c-84ca-b05134ef4cfe) |
 
 The application supports two user roles:
 - **Admin**: For managing auctions and overseeing the platform
@@ -20,12 +20,12 @@ The application supports two user roles:
 ### Main Features
 | Home Screen | Map View | History |
 |-------------|----------|----------|
-| <img src="screenshots/home.png" width="300"> | <img src="screenshots/map.png" width="300"> | <img src="screenshots/history.png" width="300"> |
+| ![image](https://github.com/user-attachments/assets/eb4f4572-6f7b-4a16-8f0a-ed915b753a83) | ![image](https://github.com/user-attachments/assets/eea3327d-0a33-466b-824a-ae5ceddbce13) | ![image](https://github.com/user-attachments/assets/8ac4c831-b9fc-4744-a894-b228046207b4) |
 
-### Admin Features
-| Add Auction Item | Profile Page |
+### More Features
+| Add Auction Item | Bid Page |
 |-----------------|--------------|
-| <img src="screenshots/add_item.png" width="300"> | <img src="screenshots/profile.png" width="300"> |
+| ![image](https://github.com/user-attachments/assets/b9c044bf-859d-4cf4-a282-cfdb9011b35b) | ![image](https://github.com/user-attachments/assets/b5c62566-25a0-407f-a23d-487450972c01) |
 
 ## Features
 
