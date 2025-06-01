@@ -11,7 +11,7 @@ E-Pelelangan is a comprehensive auction platform that connects buyers and admini
 ### User Authentication
 | Role Selection | Login Screen |
 |----------------|--------------|
-| <img src="screenshots/role_selection.png" width="300"> | <img src="screenshots/login.png" width="300"> |
+| ![image](https://github.com/user-attachments/assets/ee6fce23-e063-4a27-8da5-8c35d30506b1)| <img src="screenshots/login.png" width="300"> |
 
 The application supports two user roles:
 - **Admin**: For managing auctions and overseeing the platform
