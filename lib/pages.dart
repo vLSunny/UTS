@@ -5,6 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'main.dart';
 
 // ProfilPage
@@ -125,9 +127,11 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   List<Marker> markers = [];
+  List<Marker> placeMarkers = []; // Markers for places of worship
   LatLng? currentPosition;
   String currentMapStyle = 'OpenStreetMap';
   double nearbyRadius = 5000; // default radius in meters
+  bool isLoading = false;
   Map<String, String> mapStyles = {
     'OpenStreetMap': 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     'OpenTopoMap': 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
@@ -139,6 +143,7 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     _getCurrentPosition();
+    _searchNearbyPlaces();
   }
 
   void _loadMarkers() {
@@ -198,6 +203,20 @@ class _MapPageState extends State<MapPage> {
         }
       }
     }
+    // Add nearby places markers
+    for (var place in placeMarkers) {
+      markers.add(
+        Marker(
+          width: 80,
+          height: 80,
+          point: place.point,
+          child: Tooltip(
+            message: 'Tempat Ibadah',
+            child: const Icon(Icons.place, color: Colors.blue, size: 40),
+          ),
+        ),
+      );
+    }
   }
 
   void _addMarker(LatLng point) {
@@ -210,12 +229,6 @@ class _MapPageState extends State<MapPage> {
           child: const Icon(Icons.location_on, color: Colors.blue, size: 40),
         ),
       );
-    });
-  }
-
-  void _removeMarker(LatLng point) {
-    setState(() {
-      markers.removeWhere((marker) => marker.point == point);
     });
   }
 
@@ -315,12 +328,137 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  Future<void> _searchNearbyPlaces() async {
+    if (currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lokasi saat ini tidak tersedia')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      placeMarkers.clear();
+    });
+
+    try {
+      final radius = (nearbyRadius / 1000).toStringAsFixed(1); // Convert to km
+      final url = Uri.parse(
+          'https://nominatim.openstreetmap.org/search.php?q=tempat+ibadah'
+          '&format=jsonv2'
+          '&limit=10'
+          '&lat=${currentPosition!.latitude}'
+          '&lon=${currentPosition!.longitude}'
+          '&radius=$radius'
+          '&addressdetails=1');
+
+      final response = await http.get(url, headers: {
+        'User-Agent': 'EPelanggan/1.0', // Required by Nominatim
+      });
+
+      if (response.statusCode == 200) {
+        final List<dynamic> places = json.decode(response.body);
+
+        for (var place in places) {
+          final lat = double.parse(place['lat']);
+          final lon = double.parse(place['lon']);
+          final name = place['display_name'] ?? 'Tempat Ibadah';
+
+          placeMarkers.add(
+            Marker(
+              width: 80,
+              height: 80,
+              point: LatLng(lat, lon),
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('Detail Tempat Ibadah'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(name),
+                          const SizedBox(height: 8),
+                          Text('Latitude: ${lat.toStringAsFixed(6)}'),
+                          Text('Longitude: ${lon.toStringAsFixed(6)}'),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Tutup'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _startNavigation(LatLng(lat, lon));
+                          },
+                          child: const Text('Navigasi'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Tempat Ibadah',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.place_outlined,
+                        color: Colors.purple, size: 40),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        setState(() {
+          markers = [...markers, ...placeMarkers];
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Peta'),
         actions: [
+          // Tombol cari tempat ibadah
+          IconButton(
+            icon: const Icon(Icons.church),
+            onPressed: _searchNearbyPlaces,
+            tooltip: 'Cari Tempat Ibadah Terdekat',
+          ),
           PopupMenuButton<String>(
             onSelected: _changeMapStyle,
             itemBuilder: (context) {
@@ -365,6 +503,93 @@ class _MapPageState extends State<MapPage> {
       ),
       body: Column(
         children: [
+          // Koordinat Lokasi Pengguna
+          if (isLoading)
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
+            decoration: BoxDecoration(
+              color: Colors.deepPurple.shade50,
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.deepPurple.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.my_location,
+                  color: Colors.deepPurple,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Lokasi Anda:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple.shade700,
+                        ),
+                      ),
+                      Text(
+                        currentPosition != null
+                            ? 'Lat: ${currentPosition!.latitude.toStringAsFixed(6)}'
+                            : 'Lat: Mencari lokasi...',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                      Text(
+                        currentPosition != null
+                            ? 'Lng: ${currentPosition!.longitude.toStringAsFixed(6)}'
+                            : 'Lng: Mencari lokasi...',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (currentPosition != null)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'AKTIF',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           Slider(
             value: nearbyRadius,
             min: 1000,
